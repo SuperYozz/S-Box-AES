@@ -1,258 +1,197 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AES S-Box Konversi — HTML/JS</title>
-  <style>
-    :root{
-      --bg:#f6f8fb;
-      --card:#ffffff;
-      --muted:#6b7280;
-      --accent:#0b69ff;
-      --good:#0b7a3a;
-      --bad:#c0262c;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AES Tools (S-Box & XOR Calculator)</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f1f5f9;
+        margin: 0;
+        padding: 0;
     }
-    body{
-      margin:0;
-      background:linear-gradient(180deg,var(--bg),#eef2f7);
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:32px;
+    .container {
+        max-width: 480px;
+        margin: auto;
+        margin-top: 20px;
+        background: white;
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    .card{
-      background:var(--card);
-      border-radius:12px;
-      padding:24px;
-      box-shadow:0 6px 30px rgba(15,23,42,0.08);
-      width:420px;
-      max-width:95%;
+    h2 {
+        text-align: center;
+        font-size: 24px;
+        color: #111;
     }
-    h1{
-      margin:0 0 10px 0;
-      font-size:18px;
-      letter-spacing:0.2px;
+    h3 {
+        margin-top: 25px;
+        color: #222;
+        text-align: center;
     }
-    p.lead{ margin:0 0 18px 0; color:var(--muted); font-size:13px; }
-    .row{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      margin-bottom:10px;
+    label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        display: block;
+        font-size: 15px;
     }
-    label{
-      width:92px;
-      font-size:13px;
-      color:#111827;
+    input {
+        width: 100%;
+        padding: 14px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        border: 1px solid #aaa;
+        font-size: 18px;
+        font-family: Courier;
+        background: #f8fafc;
     }
-    input[type="text"]{
-      width:70px;
-      padding:8px 10px;
-      border-radius:8px;
-      border:1px solid #e6e9ef;
-      font-family: "Courier New", monospace;
-      font-size:14px;
-      text-transform:uppercase;
-      text-align:center;
+    .result-box {
+        padding: 12px;
+        background: #e7f3ff;
+        border-radius: 10px;
+        font-size: 18px;
+        margin-top: 10px;
+        text-align: center;
+        font-family: Courier;
     }
-    .arrow{ width:28px; text-align:center; color:#374151; font-size:18px; }
-    .result{
-      min-width:54px;
-      height:36px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:8px;
-      font-family:"Courier New", monospace;
-      font-weight:700;
-      background:#f3f6fb;
-      color:var(--accent);
-      font-size:14px;
-      border:1px solid #e6eefb;
+    .operation {
+        background: #eef2ff;
+        padding: 12px;
+        border-radius: 10px;
+        font-family: Courier;
+        text-align: center;
+        font-size: 16px;
+        margin-top: 10px;
     }
-    .hint{ font-size:12px; color:var(--muted); margin-top:8px; }
-    .controls{ display:flex; gap:8px; margin-top:14px; }
-    button{
-      padding:8px 12px;
-      border-radius:8px;
-      border: none;
-      cursor:pointer;
-      font-weight:600;
-      background:var(--accent);
-      color:white;
+    .hex { color: #1d4ed8; font-weight: bold; }
+    .bin { color: #059669; font-weight: bold; }
+
+    /* mobile */
+    @media (max-width: 480px) {
+        input { font-size: 20px; }
+        h2 { font-size: 22px; }
     }
-    button.ghost{
-      background:transparent;
-      border:1px solid #d1d5db;
-      color:#111827;
-      font-weight:600;
-    }
-    footer{ margin-top:14px; font-size:12px; color:var(--muted); text-align:center; }
-    @media (max-width:420px){
-      .card{ padding:16px; }
-      label{ width:80px; font-size:13px; }
-    }
-  </style>
+</style>
+
 </head>
 <body>
-  <main class="card" role="main">
-    <h1>AES S-Box Konversi</h1>
-    <p class="lead">Masukkan 2 digit heksadesimal (00–FF). Hasil langsung muncul lewat S-Box AES.</p>
 
-    <div id="inputs">
-      <!-- baris input akan di-generate oleh JS -->
+<div class="container">
+    <h2>AES Tools</h2>
+
+    <!-- ========================== -->
+    <!--        S-BOX AES           -->
+    <!-- ========================== -->
+    <h3>Kalkulator S-Box AES</h3>
+
+    <label>Masukkan Hex (2 digit):</label>
+    <input id="sboxInput" maxlength="2" placeholder="Contoh: 7F" oninput="calcSBox()">
+
+    <div class="result-box">
+    
+        Hasil S-Box: <b><span id="sboxOutput" style="color:red;">??</b></span>
+    </div>
+    <h3>Kalkulator XOR</h3>
+
+    <label>Hex 1 (2 digit):</label>
+    <input id="hex1" maxlength="2" oninput="updateXOR()" placeholder="A1">
+
+    <label>Hex 2 (2 digit):</label>
+    <input id="hex2" maxlength="2" oninput="updateXOR()" placeholder="7B">
+
+    <label>Biner (8 bit):</label>
+    <input id="bin" maxlength="8" oninput="updateXOR()" placeholder="11001100">
+
+    <div class="operation" id="operation">(?? XOR ??) XOR ????????</div>
+
+    <div class="result-box">
+        Hex: <b><span id="hexResult" class="hex" style="color:red;">??</span></b><br>
+        Biner: <span id="binResult" class="bin">????????</span>
     </div>
 
-    <div class="hint">Contoh input: <code>00</code>, <code>3f</code>, <code>AA</code>. Jika input invalid, tampil "??".</div>
+</div>
 
-    <div class="controls">
-      <button id="btn-clear" class="ghost" type="button">Bersihkan</button>
-      <button id="btn-random" type="button">Acak 4 nilai</button>
-      <button id="btn-copy" type="button">Salin hasil</button>
-    </div>
 
-    <footer>Implementasi S-Box AES (standar) — konversi langsung di sisi klien.</footer>
-  </main>
 
-  <script>
-    // S-Box AES (256 values)
-    const sbox = [
-      0x63,0x7C,0x77,0x7B,0xF2,0x6B,0x6F,0xC5,0x30,0x01,0x67,0x2B,0xFE,0xD7,0xAB,0x76,
-      0xCA,0x82,0xC9,0x7D,0xFA,0x59,0x47,0xF0,0xAD,0xD4,0xA2,0xAF,0x9C,0xA4,0x72,0xC0,
-      0xB7,0xFD,0x93,0x26,0x36,0x3F,0xF7,0xCC,0x34,0xA5,0xE5,0xF1,0x71,0xD8,0x31,0x15,
-      0x04,0xC7,0x23,0xC3,0x18,0x96,0x05,0x9A,0x07,0x12,0x80,0xE2,0xEB,0x27,0xB2,0x75,
-      0x09,0x83,0x2C,0x1A,0x1B,0x6E,0x5A,0xA0,0x52,0x3B,0xD6,0xB3,0x29,0xE3,0x2F,0x84,
-      0x53,0xD1,0x00,0xED,0x20,0xFC,0xB1,0x5B,0x6A,0xCB,0xBE,0x39,0x4A,0x4C,0x58,0xCF,
-      0xD0,0xEF,0xAA,0xFB,0x43,0x4D,0x33,0x85,0x45,0xF9,0x02,0x7F,0x50,0x3C,0x9F,0xA8,
-      0x51,0xA3,0x40,0x8F,0x92,0x9D,0x38,0xF5,0xBC,0xB6,0xDA,0x21,0x10,0xFF,0xF3,0xD2,
-      0xCD,0x0C,0x13,0xEC,0x5F,0x97,0x44,0x17,0xC4,0xA7,0x7E,0x3D,0x64,0x5D,0x19,0x73,
-      0x60,0x81,0x4F,0xDC,0x22,0x2A,0x90,0x88,0x46,0xEE,0xB8,0x14,0xDE,0x5E,0x0B,0xDB,
-      0xE0,0x32,0x3A,0x0A,0x49,0x06,0x24,0x5C,0xC2,0xD3,0xAC,0x62,0x91,0x95,0xE4,0x79,
-      0xE7,0xC8,0x37,0x6D,0x8D,0xD5,0x4E,0xA9,0x6C,0x56,0xF4,0xEA,0x65,0x7A,0xAE,0x08,
-      0xBA,0x78,0x25,0x2E,0x1C,0xA6,0xB4,0xC6,0xE8,0xDD,0x74,0x1F,0x4B,0xBD,0x8B,0x8A,
-      0x70,0x3E,0xB5,0x66,0x48,0x03,0xF6,0x0E,0x61,0x35,0x57,0xB9,0x86,0xC1,0x1D,0x9E,
-      0xE1,0xF8,0x98,0x11,0x69,0xD9,0x8E,0x94,0x9B,0x1E,0x87,0xE9,0xCE,0x55,0x28,0xDF,
-      0x8C,0xA1,0x89,0x0D,0xBF,0xE6,0x42,0x68,0x41,0x99,0x2D,0x0F,0xB0,0x54,0xBB,0x16
-    ];
+<script>
+// ======================================================
+//                  AES S-BOX TABLE
+// ======================================================
+const SBOX = [
+  [0x63,0x7C,0x77,0x7B,0xF2,0x6B,0x6F,0xC5,0x30,0x01,0x67,0x2B,0xFE,0xD7,0xAB,0x76],
+  [0xCA,0x82,0xC9,0x7D,0xFA,0x59,0x47,0xF0,0xAD,0xD4,0xA2,0xAF,0x9C,0xA4,0x72,0xC0],
+  [0xB7,0xFD,0x93,0x26,0x36,0x3F,0xF7,0xCC,0x34,0xA5,0xE5,0xF1,0x71,0xD8,0x31,0x15],
+  [0x04,0xC7,0x23,0xC3,0x18,0x96,0x05,0x9A,0x07,0x12,0x80,0xE2,0xEB,0x27,0xB2,0x75],
+  [0x09,0x83,0x2C,0x1A,0x1B,0x6E,0x5A,0xA0,0x52,0x3B,0xD6,0xB3,0x29,0xE3,0x2F,0x84],
+  [0x53,0xD1,0x00,0xED,0x20,0xFC,0xB1,0x5B,0x6A,0xCB,0xBE,0x39,0x4A,0x4C,0x58,0xCF],
+  [0xD0,0xEF,0xAA,0xFB,0x43,0x4D,0x33,0x85,0x45,0xF9,0x02,0x7F,0x50,0x3C,0x9F,0xA8],
+  [0x51,0xA3,0x40,0x8F,0x92,0x9D,0x38,0xF5,0xBC,0xB6,0xDA,0x21,0x10,0xFF,0xF3,0xD2],
+  [0xCD,0x0C,0x13,0xEC,0x5F,0x97,0x44,0x17,0xC4,0xA7,0x7E,0x3D,0x64,0x5D,0x19,0x73],
+  [0x60,0x81,0x4F,0xDC,0x22,0x2A,0x90,0x88,0x46,0xEE,0xB8,0x14,0xDE,0x5E,0x0B,0xDB],
+  [0xE0,0x32,0x3A,0x0A,0x49,0x06,0x24,0x5C,0xC2,0xD3,0xAC,0x62,0x91,0x95,0xE4,0x79],
+  [0xE7,0xC8,0x37,0x6D,0x8D,0xD5,0x4E,0xA9,0x6C,0x56,0xF4,0xEA,0x65,0x7A,0xAE,0x08],
+  [0xBA,0x78,0x25,0x2E,0x1C,0xA6,0xB4,0xC6,0xE8,0xDD,0x74,0x1F,0x4B,0xBD,0x8B,0x8A],
+  [0x70,0x3E,0xB5,0x66,0x48,0x03,0xF6,0x0E,0x61,0x35,0x57,0xB9,0x86,0xC1,0x1D,0x9E],
+  [0xE1,0xF8,0x98,0x11,0x69,0xD9,0x8E,0x94,0x9B,0x1E,0x87,0xE9,0xCE,0x55,0x28,0xDF],
+  [0x8C,0xA1,0x89,0x0D,0xBF,0xE6,0x42,0x68,0x41,0x99,0x2D,0x0F,0xB0,0x54,0xBB,0x16]
+];
 
-    // util: valid hex 2-digit
-    const isHex2 = (s) => /^[0-9A-Fa-f]{2}$/.test(s.trim());
+// ================== S-BOX FUNCTION =====================
+function calcSBox() {
+    let hex = document.getElementById("sboxInput").value.toUpperCase();
+    document.getElementById("sboxInput").value = hex;
 
-    // create 4 input rows
-    const container = document.getElementById('inputs');
-    const inputs = [];
-    const results = [];
-
-    for(let i=0;i<4;i++){
-      const row = document.createElement('div');
-      row.className = 'row';
-
-      const lbl = document.createElement('label');
-      lbl.textContent = `Input ${i+1} (hex):`;
-      row.appendChild(lbl);
-
-      const inp = document.createElement('input');
-      inp.type = 'text';
-      inp.maxLength = 2;
-      inp.placeholder = '00';
-      inp.autocomplete = 'off';
-      inp.inputMode = 'latin'; // hint for mobile keyboards
-      inp.addEventListener('input', onChange);
-      row.appendChild(inp);
-      inputs.push(inp);
-
-      const arrow = document.createElement('div');
-      arrow.className = 'arrow';
-      arrow.textContent = '→';
-      row.appendChild(arrow);
-
-      const res = document.createElement('div');
-      res.className = 'result';
-      res.textContent = '??';
-      row.appendChild(res);
-      results.push(res);
-
-      container.appendChild(row);
+    if (!/^[0-9A-F]{2}$/.test(hex)) {
+        document.getElementById("sboxOutput").textContent = "??";
+        return;
     }
 
-    // function to update a single input's result
-    function updateOne(index){
-      const v = inputs[index].value.trim();
-      if(isHex2(v)){
-        const n = parseInt(v,16);
-        const out = sbox[n];
-        results[index].textContent = out.toString(16).toUpperCase().padStart(2,'0');
-      } else {
-        results[index].textContent = '??';
-      }
+    let row = parseInt(hex[0], 16);
+    let col = parseInt(hex[1], 16);
+    let value = SBOX[row][col];
+
+    document.getElementById("sboxOutput").textContent =
+        value.toString(16).toUpperCase().padStart(2, "0");
+}
+
+
+
+// ======================================================
+//                   XOR CALCULATOR
+// ======================================================
+function updateXOR() {
+    let h1 = document.getElementById("hex1").value.toUpperCase();
+    let h2 = document.getElementById("hex2").value.toUpperCase();
+    let b  = document.getElementById("bin").value;
+
+    document.getElementById("operation").textContent =
+        `(${h1 || "??"} XOR ${h2 || "??"}) XOR ${b || "????????"}`;
+
+    if (h1.length !== 2 || h2.length !== 2 || b.length !== 8) {
+        document.getElementById("hexResult").textContent = "??";
+        document.getElementById("binResult").textContent = "????????";
+        return;
     }
 
-    // called on each input event
-    function onChange(e){
-      // normalize to uppercase (keep cursor at end)
-      const el = e.target;
-      const pos = el.selectionStart;
-      el.value = el.value.toUpperCase().replace(/[^0-9A-F]/g,'').slice(0,2);
-      // after normalization, update corresponding result
-      const idx = inputs.indexOf(el);
-      if(idx !== -1) updateOne(idx);
-      // restore cursor (safe)
-      el.setSelectionRange(pos, pos);
-    }
+    if (!/^[0-9A-F]{2}$/.test(h1) || !/^[0-9A-F]{2}$/.test(h2)) return;
+    if (!/^[01]{8}$/.test(b)) return;
 
-    // initial update (in case placeholder used)
-    inputs.forEach((_,i)=>updateOne(i));
+    let num1 = parseInt(h1, 16);
+    let num2 = parseInt(h2, 16);
+    let num3 = parseInt(b, 2);
 
-    // Controls
-    document.getElementById('btn-clear').addEventListener('click', ()=>{
-      inputs.forEach(inp => inp.value='');
-      results.forEach(r => r.textContent='??');
-      inputs[0].focus();
-    });
+    let xor1 = num1 ^ num2;
+    let final_xor = xor1 ^ num3;
 
-    document.getElementById('btn-random').addEventListener('click', ()=>{
-      for(let i=0;i<4;i++){
-        const rand = Math.floor(Math.random()*256);
-        const hex = rand.toString(16).toUpperCase().padStart(2,'0');
-        inputs[i].value = hex;
-        updateOne(i);
-      }
-    });
+    document.getElementById("hexResult").textContent =
+        final_xor.toString(16).toUpperCase().padStart(2, "0");
 
-    document.getElementById('btn-copy').addEventListener('click', async ()=>{
-      const out = results.map(r => r.textContent).join(' ');
-      try{
-        await navigator.clipboard.writeText(out);
-        alert('Hasil disalin: ' + out);
-      }catch(e){
-        // fallback
-        const ta = document.createElement('textarea');
-        ta.value = out;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-        alert('Hasil disalin: ' + out);
-      }
-    });
+    document.getElementById("binResult").textContent =
+        final_xor.toString(2).padStart(8, "0");
+}
+</script>
 
-    // Optional: support paste of 4-byte hex like "00 1F AA C3" into first input
-    container.addEventListener('paste', (ev)=>{
-      const txt = (ev.clipboardData || window.clipboardData).getData('text');
-      const parts = txt.match(/[0-9A-Fa-f]{2}/g);
-      if(parts && parts.length >= 1){
-        ev.preventDefault();
-        for(let i=0;i<4;i++){
-          if(parts[i]) inputs[i].value = parts[i].toUpperCase();
-          else inputs[i].value = '';
-          updateOne(i);
-        }
-      }
-    });
-
-  </script>
 </body>
 </html>
